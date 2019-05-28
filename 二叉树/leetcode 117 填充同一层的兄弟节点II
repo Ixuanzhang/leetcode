@@ -1,0 +1,98 @@
+中文题目链接：https://leetcode-cn.com/problems/populating-next-right-pointers-in-each-node-ii/
+题目要求：
+给定一个二叉树
+
+struct Node {
+  int val;
+  Node *left;
+  Node *right;
+  Node *next;
+}
+填充它的每个 next 指针，让这个指针指向其下一个右侧节点。如果找不到下一个右侧节点，则将 next 指针设置为 NULL。
+初始状态下，所有 next 指针都被设置为 NULL。
+
+示例：
+输入：{"$id":"1","left":{"$id":"2","left":{"$id":"3","left":null,"next":null,"right":null,"val":4},"next":null,"right":{"$id":"4","left":null,"next":null,"right":null,"val":5},"val":2},"next":null,"right":{"$id":"5","left":null,"next":null,"right":{"$id":"6","left":null,"next":null,"right":null,"val":7},"val":3},"val":1}
+
+输出：{"$id":"1","left":{"$id":"2","left":{"$id":"3","left":null,"next":{"$id":"4","left":null,"next":{"$id":"5","left":null,"next":null,"right":null,"val":7},"right":null,"val":5},"right":null,"val":4},"next":{"$id":"6","left":null,"next":null,"right":{"$ref":"5"},"val":3},"right":{"$ref":"4"},"val":2},"next":null,"right":{"$ref":"6"},"val":1}
+
+解释：给定二叉树如图 A 所示，你的函数应该填充它的每个 next 指针，以指向其下一个右侧节点，如图 B 所示。
+
+提示：
+你只能使用常量级额外空间。
+使用递归解题也符合要求，本题中递归程序占用的栈空间不算做额外的空间复杂度
+
+解答方法一：使用队列进行层次遍历   但此方法占用的是非常量级的额外空间
+  代码如下：
+  class Solution {
+  public:
+      Node* connect(Node* root) {
+          queue<Node*> q;
+          Node *back;
+          if(root==NULL)
+              return root;
+          q.push(root);
+          root->next=NULL;
+          while (!q.empty()){
+              int len=q.size();
+              Node* front=q.front();
+              q.pop();
+              if(front->left!=NULL)
+                  q.push(front->left);
+              if(front->right!=NULL)
+                  q.push(front->right);
+              for(int i=2;i<=len;i++) {
+                  back=q.front();
+                  q.pop();
+                  if(back->left!=NULL)
+                      q.push(back->left);
+                  if(back->right!=NULL)
+                      q.push(back->right);
+                  front->next=back;
+                  front=back;
+              }
+              front->next=NULL;
+          }
+          return root;
+      }
+};
+
+解答方法二、
+利用两个链表：
+  pre链表：永远指向上一层
+  nextNode链表：永远指向下一层（利用pre构建nextNode）
+  
+  代码如下：
+  class Solution {
+  public:
+      Node* connect(Node* root) {
+          //之前 使用队列进行层次遍历   使用了额外的非常数级空间
+          Node* pre=root;
+          Node* nextNode=new Node();
+          Node* p;
+          Node* q;
+          if(root==NULL)
+              return root;
+          root->next=NULL;
+          while (pre!=NULL){
+              p=pre;
+              q=nextNode;
+              while (p!=NULL){
+                  //printf("%d\n",p->val);
+                  if(p->left!=NULL){
+                      q->next=p->left;
+                      q=q->next;
+                  }
+                  if(p->right!=NULL){
+                      q->next=p->right;
+                      q=q->next;
+                  }
+                  p=p->next;
+              }
+              q->next=NULL;
+              pre=nextNode->next;
+              nextNode->next=NULL;
+          }
+          return root;
+      }
+  };
