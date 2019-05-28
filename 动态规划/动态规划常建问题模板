@@ -1,0 +1,54 @@
+一、最长公共子序列模板：
+class Solution {
+public:
+    int dp[1005][1005];
+    int findLength(vector<int>& A, vector<int>& B) {
+        int len1=A.size(),len2=B.size();
+        memset(dp,0,sizeof(dp));
+        for(int i=0;i<=len1;i++){   // i 对应A的下标
+            for(int j=0;j<=len2;j++){   //j 对应B的下标
+                if((i==0) || (j==0))   //0行0列补的  全赋值为0   为了 i-1 j-1 不越界
+                    dp[i][j]=0;
+                else{
+                    if(A[i-1]==B[j-1])   //注意dp数组行列均从1开始  而A B数组均从0开始   
+                        dp[i][j]=dp[i-1][j-1]+1;
+                    else
+                        dp[i][j]=max(dp[i-1][j],dp[i][j-1]);
+                }
+            }
+        }
+        return dp[len1][len2];
+    }
+};
+
+
+二、最长公共字串模板（字串必须要连续  子序列（非连续（定义就是如此）））
+（leetcode  最长重复子数组（注：子数组也要求连续））
+class Solution {
+public:
+    int findLength(vector<int>& A, vector<int>& B) {
+        int maxLen=0;
+        int len1=A.size(),len2=B.size();
+        if((len1==0)||(len2==0))
+            return 0;
+        int dp[len1+5][len2+5];   //这的理解很重要：以对应的A[i] B[j] 为结尾的  最长公共字串的长度
+        memset(dp,0,sizeof(dp));
+        for(int i=0;i<=len1;i++){   // i 对应A的下标
+            for(int j=0;j<=len2;j++){   //j 对应B的下标
+                if((i==0) || (j==0))   //0行0列补的  全赋值为0   为了 i-1 j-1 不越界
+                    dp[i][j]=0;
+                else{
+                    if(A[i-1]==B[j-1])   //注意dp数组行列均从1开始  而A B数组均从0开始
+                    {    
+                        dp[i][j]=dp[i-1][j-1]+1;
+                        if(dp[i][j]>maxLen)
+                            maxLen=dp[i][j];
+                    }
+                    else
+                        dp[i][j]=0;
+                }
+            }
+        }
+        return maxLen;
+    }
+};
