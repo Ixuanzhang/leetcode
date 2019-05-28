@@ -1,0 +1,89 @@
+中文题目链接：https://leetcode-cn.com/problems/surrounded-regions/
+
+题目：
+  给定一个二维的矩阵，包含 'X' 和 'O'（字母 O）。
+  找到所有被 'X' 围绕的区域，并将这些区域里所有的 'O' 用 'X' 填充。
+
+  示例:
+  X X X X
+  X O O X
+  X X O X
+  X O X X
+  运行你的函数后，矩阵变为：
+  X X X X
+  X X X X
+  X X X X
+  X O X X
+
+  解释:
+    被围绕的区间不会存在于边界上，换句话说，任何边界上的 'O' 都不会被填充为 'X'。 任何不在边界上，或不与边界上的 'O' 相连的 'O' 最终都会被填充为 'X'。
+  如果两个元素在水平或垂直方向相邻，则称它们是“相连”的。
+  
+ 解题思路：
+   方法一：dfs 
+      步骤：1、搜索外围的’o‘  将其替换为‘A’
+           2、bfs搜索与外围‘O'相连的’o'，也将其替换为‘A’
+           3、遍历整个矩阵，将’O‘替换为’X'   将‘A’替换为‘O’
+     
+       代码：
+            class Solution {
+            public:
+                struct node{
+                    char c;
+                    int row,col;
+                };
+                int dir[4][2]={{-1,0},{1,0},{0,-1},{0,1}};
+                void bfs(int row,int col,vector<vector<char>>& board){
+                    int r=board.size();
+                    int c=board[0].size();
+                    queue<node> q;
+                    q.push(node{board[row][col],row,col});
+                    while (!q.empty()){
+                        node temp=q.front();
+                        q.pop();
+                        for(int i=0;i<4;i++){
+                            int x=temp.row+dir[i][0];
+                            int y=temp.col+dir[i][1];
+                            if(x>=0 && x<r && y>=0 && y<c && board[x][y]=='O'){
+                                board[x][y]='A';
+                                q.push(node{board[x][y],x,y});
+                            }
+                        }
+                    }
+
+                }
+                void solve(vector<vector<char>>& board) {
+                    int row=board.size();
+                    if(row!=0){
+                        int col=board[0].size();
+                        for(int j=0;j<col;j++){
+                            if(board[0][j]=='O'){
+                                board[0][j]='A';
+                                bfs(0,j,board);
+                            }
+                            if(board[row-1][j]=='O'){
+                                board[row-1][j]='A';
+                                bfs(row-1,j,board);
+                            }
+                        }
+                        for(int i=1;i<row-1;i++){
+                            if(board[i][0]=='O'){
+                                board[i][0]='A';
+                                bfs(i,0,board);
+                            }
+                            if(board[i][col-1]=='O'){
+                                board[i][col-1]='A';
+                                bfs(i,col-1,board);
+                            }
+                        }
+                        for(int i=0;i<row;i++){
+                            for(int j=0;j<col;j++){
+                                if(board[i][j]=='O')
+                                    board[i][j]='X';
+                                if(board[i][j]=='A')
+                                    board[i][j]='O';
+                            }
+                        }
+                    }
+                }
+            };
