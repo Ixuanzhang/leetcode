@@ -1,0 +1,52 @@
+一、二叉树的层次遍历   分层输出
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+
+class Solution {
+public:
+    vector<vector<int>> levelOrderBottom(TreeNode* root) {
+        //简化版写法
+        vector<vector<int> > levelOrder, res;
+        vector<int> temp;
+        queue<TreeNode *> q;
+        TreeNode *c;
+        if (root == NULL)
+            return res;
+        q.push(root);
+        while (!q.empty()) {
+            int len = q.size();
+            for (int i = 0; i < len; ++i) {
+                c = q.front();
+                q.pop();
+                temp.push_back(c->val);
+                if (c->left != NULL) {
+                    q.push(c->left);
+                }
+                if (c->right != NULL) {
+                    q.push(c->right);
+                }
+            }
+            levelOrder.push_back(temp);
+            temp.clear();
+        }
+        int row = levelOrder.size();
+        for (int i = row - 1; i >= 0; i--)
+            res.push_back(levelOrder[i]);
+        return res;
+    }
+
+};
+
+二、前序遍历
+
+
+三、中序遍历
+
+四、后序遍历
