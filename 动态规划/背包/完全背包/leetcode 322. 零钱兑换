@@ -1,0 +1,56 @@
+题目链接：https://leetcode-cn.com/problems/coin-change/
+
+题目：
+  给定不同面额的硬币 coins 和一个总金额 amount。编写一个函数来计算可以凑成总金额所需的最少的硬币个数。如果没有任何一种硬币组合能组成总金额，返回 -1。
+
+  示例 1:
+
+  输入: coins = [1, 2, 5], amount = 11
+  输出: 3 
+  解释: 11 = 5 + 5 + 1
+  示例 2:
+
+  输入: coins = [2], amount = 3
+  输出: -1
+  说明:
+  你可以认为每种硬币的数量是无限的。
+  
+  
+解题思路：
+  这实际上是一个完全背包问题，我们定义这样的方程f(amount)，我们将n个物品放入容量为amount的背包中，使得物品金额正好为amount是，所需的硬币数目最少。我们会考虑第i个物品放入后，所需硬币数目
+
+    f(amount)=min(f(amount-coins[i])+1)
+
+    针对例子：coins=[1, 2, 5]  amount=11
+        f的值：    0  1  1  2  2  1  2  2  3  3  2  3
+
+  上述写法的前提是这个给定的coins和amount一定有解。我们初始化的时候，自然是f(0)=0，而f(i)=INT_MAX i>0。如果最后解出的f(amount)>amount，那么表示无解
+  
+  
+  代码：
+    class Solution {
+    public:
+        int coinChange(vector<int>& coins, int amount) {
+            int f[amount+1];
+            for(int i=0;i<=amount;i++)
+                f[i]=amount+1;
+            int len=coins.size();
+            f[0]=0;
+            for(int i=1;i<=amount;i++){  //计算f值
+                int minV=100000;
+                for(int j=0;j<len;j++){
+                    int temp=i-coins[j];
+                    if(temp>=0){
+                        //printf("i: %d    temp:%d\n",i,temp);
+                        if((f[temp]+1)<minV)
+                            minV=f[temp]+1;
+                    }
+                }
+                f[i]=minV;
+            }
+            if(f[amount]>amount)
+                return -1;
+            else
+                return f[amount];
+        }
+    };
