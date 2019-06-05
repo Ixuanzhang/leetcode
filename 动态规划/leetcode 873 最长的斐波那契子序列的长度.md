@@ -39,7 +39,7 @@
 
 3、解题思路：
 
-		采取动态规划，而不是dfs搜索。
+	采取动态规划
 
 ​	我们假设dp[i][j]是以A【i】与A【j】结尾的数列（因为默认了Ai<Aj）。
 
@@ -55,7 +55,7 @@
 
 4、代码
 
-`class Solution {
+class Solution {
 public:
     int lenLongestFibSubseq(vector<int>& A) {
         int len = A.size();
@@ -85,4 +85,4 @@ public:
             return 0;
         return ans;
     }
-};`
+};
