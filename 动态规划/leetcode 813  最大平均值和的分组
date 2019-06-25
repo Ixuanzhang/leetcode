@@ -1,0 +1,65 @@
+题目链接：https://leetcode-cn.com/problems/largest-sum-of-averages/
+
+题目：
+  我们将给定的数组 A 分成 K 个相邻的非空子数组 ，我们的分数由每个子数组内的平均值的总和构成。计算我们所能得到的最大分数是多少。
+
+  注意我们必须使用 A 数组中的每一个数进行分组，并且分数不一定需要是整数。
+
+  示例:
+  输入: 
+  A = [9,1,2,3,9]
+  K = 3
+  输出: 20
+  解释: 
+  A 的最优分组是[9], [1, 2, 3], [9]. 得到的分数是 9 + (1 + 2 + 3) / 3 + 9 = 20.
+  我们也可以把 A 分成[9, 1], [2], [3, 9].
+  这样的分组得到的分数为 5 + 2 + 6 = 13, 但不是最大值.
+  说明:
+
+  1 <= A.length <= 100.
+  1 <= A[i] <= 10000.
+  1 <= K <= A.length.
+  答案误差在 10^-6 内被视为是正确的。
+
+思路：
+  首先明确一点，就是把组划分的越多，则平均数之和越大，所以只要K不超过A中的元素个数，那么的结果一定是对应划分成了K组，而不是比K小的组。
+
+  我们定义dp[i][k]表示将A[0]到A[i]这i+1个元素划分成为k组的话，平均数之和的最大值，然后推导递推公式：
+  1）如果k == 1，说明我们将这i+1个元素归为1组，所以dp[i][k] = avg(A[0],...A[i])；
+  2）如果k > 1，那么我么可以采用的策略是：将A[j], A[i]这i-j+1个数划分为1组，那么此时就需要将A[0],...A[j - 1]划分成为另外的k-1组（k - 1 <= j <= i）。在这所有的划分方法中，我们需要取使得dp[i][k]达到最大值的那种划分，所以dp[i][k] = max(dp[j - 1][k - 1] + avg(A[j],...A[i])), k - 1 <= j <= i。最后得到的dp[n - 1][K]即为所求。
+  
+  由于我们需要求不同区间的平均数，所以在程序的第一步，我们首先利用O(n)的时间复杂度计算出A数组的累积和，这样在后面就可以在O(1)时间内求出任意区间内数值的平均值了。
+  
+  算法的时间复杂度是O(kn^2)，空间复杂度是O(kn)，但是注意到dp[i][k]之和dp[j][k - 1]有关，其中k - 1 <= j <= i。所以实际上我们还可以进一步优化，将空间复杂度降低到O(n)。
+
+C++ 代码：
+  class Solution {
+  public:
+      double largestSumOfAverages(vector<int>& A, int K) {
+          int len=A.size();
+          vector<int> sum;
+          double dp[len][K+1];
+          memset(dp,0,sizeof(dp));
+          sum.push_back(A[0]);
+          for(int i=1;i<len;i++)
+              sum.push_back(sum[i-1]+A[i]);
+          for(int i=0;i<len;i++) //针对k=1赋值
+              dp[i][1]=((double)sum[i])/(i+1);
+          if(K==1)
+              return dp[len-1][K];
+          for(int i=0;i<len;i++){
+              for(int t=2;(t<K+1)&&(t<=(i+1));t++){   //分成几组
+                  double maxV=-1,temp;
+                  for(int j=t-1;j<=i;j++){
+                      temp=dp[j-1][t-1]+(((double)(sum[i]-sum[j-1]))/(i-j+1));
+                      if(temp>maxV)
+                          maxV=temp;
+                  }
+                  dp[i][t]=maxV;
+              }
+          }
+          return dp[len-1][K];
+      }
+  };
+
+
